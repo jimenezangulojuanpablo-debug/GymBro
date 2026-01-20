@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>GymBro AI</title>
     <style>
-        /* Diseño moderno y minimalista: negro, gris y blanco */
         body {
             font-family: Arial, sans-serif;
             background: #121212;
@@ -12,7 +11,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
             padding: 20px;
             min-height: 100vh;
         }
@@ -31,7 +29,7 @@
             height: 400px;
             padding: 15px;
             border-radius: 10px;
-            overflow-y: scroll;
+            overflow-y: auto;
             margin-bottom: 15px;
         }
 
@@ -62,7 +60,9 @@
             cursor: pointer;
         }
 
-        #send:hover { background: #e64a19; }
+        #send:hover {
+            background: #e64a19;
+        }
 
         .user {
             color: #4fc3f7;
@@ -83,8 +83,7 @@
     <div id="chat"></div>
 
     <div id="input-container">
-        <input type="text" id="input" placeholder="Escribe tu pregunta
-sobre ejercicio, dieta o fitness">
+        <input type="text" id="input" placeholder="Escribe tu pregunta sobre ejercicio, dieta o fitness">
         <button id="send">Enviar</button>
     </div>
 
@@ -97,33 +96,28 @@ sobre ejercicio, dieta o fitness">
             const message = input.value.trim();
             if (!message) return;
 
-            // Mostrar mensaje del usuario
-            chatDiv.innerHTML += `<div class="user"><b>Tú:</b>
-${message}</div>`;
+            chatDiv.innerHTML += `<div class="user"><b>Tú:</b> ${message}</div>`;
             input.value = '';
             chatDiv.scrollTop = chatDiv.scrollHeight;
 
             try {
-                // Enviar mensaje al backend
                 const res = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message })
                 });
+
                 const data = await res.json();
 
-                // Mostrar respuesta del bot
-                chatDiv.innerHTML += `<div class="bot"><b>GymBro:</b>
-${data.response}</div>`;
+                chatDiv.innerHTML += `<div class="bot"><b>GymBro:</b> ${data.response}</div>`;
                 chatDiv.scrollTop = chatDiv.scrollHeight;
 
             } catch (err) {
-                chatDiv.innerHTML += `<div class="bot"><b>GymBro:</b>
-Error al conectar con el servidor.</div>`;
+                chatDiv.innerHTML += `<div class="bot"><b>GymBro:</b> Error al conectar con el servidor.</div>`;
+                chatDiv.scrollTop = chatDiv.scrollHeight;
             }
         };
 
-        // También enviar mensaje con tecla Enter
         input.addEventListener("keypress", function(e) {
             if (e.key === "Enter") sendBtn.click();
         });
