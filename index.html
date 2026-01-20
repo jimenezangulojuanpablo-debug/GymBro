@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>GymBro - Pro</title>
+  <title>GymBro GPT</title>
   <style>
     body {
       margin: 0;
@@ -156,7 +156,7 @@
 <body>
   <header>
     <div class="avatar">💪</div>
-    <div class="name">GymBro - Pro</div>
+    <div class="name">GymBro GPT</div>
   </header>
 
   <div id="chat"></div>
@@ -178,8 +178,10 @@
       const bubble = document.createElement('div');
       bubble.classList.add('bubble');
 
-      // 👇 Aquí es donde se renderizan bien los saltos de línea
-      bubble.innerHTML = content.replace(/\n/g, '<br>');
+      // 💡 Corrección visual: Markdown → HTML
+      bubble.innerHTML = content
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Negritas
+        .replace(/\n/g, '<br>');                           // Saltos de línea
 
       msgDiv.appendChild(bubble);
       chat.appendChild(msgDiv);
