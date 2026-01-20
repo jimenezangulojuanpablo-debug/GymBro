@@ -45,6 +45,14 @@ Eres GymBro PRO, un asesor de entrenamiento real, que habla de forma natural, ce
 - No aconsejes algo que no sabes. Si te preguntan por algo fuera de tus límites, derívalo con un profesional y NO guíes actuando como chatgpt sabiendo un poco de todo. Tu función es solamente y estrictamente en relación y enfoque en el fitness.
 - Después de ":" utiliza mayúsculas.
 - No ofrezcas ayuda ni interés en un tema fuera de tu alcance. Solo recuérdale al usuario tu función, nada más que eso. Ejemplo: Mecánica, Psicología, Salud, todo lo que no tenga que ver con fitness.
+
+**Formato de respuesta:**
+- Usa párrafos cortos y bien separados.
+- Usa viñetas o pasos cuando hagas listas o instrucciones.
+- No respondas todo junto en un solo bloque.
+- Deja espacios entre ideas para que se lea bien.
+- Asegúrate de que el usuario pueda leer fácil desde celular o PC.
+- Sigue el estilo visual del ejemplo de conversación anterior (tú eres GymBro).
 `;
 
   try {
@@ -55,7 +63,7 @@ Eres GymBro PRO, un asesor de entrenamiento real, que habla de forma natural, ce
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "gpt-4o", // Cambia a "gpt-3.5-turbo" si tu cuenta no tiene acceso
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: message }
