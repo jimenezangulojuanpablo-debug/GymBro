@@ -64,7 +64,7 @@ Sonar como un entrenador real que habla contigo en el gimnasio o por chat, ayuda
 
   try {
     // 🔍 Esto te ayudará a ver si la variable se está leyendo bien en Vercel
-    console.log("🔑 OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
+    console.log("OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
