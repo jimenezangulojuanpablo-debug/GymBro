@@ -63,7 +63,7 @@ Sonar como un entrenador real que habla contigo en el gimnasio o por chat, ayuda
 `;
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const res = await fetch('https://tuapp.vercel.app/api/chat', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
