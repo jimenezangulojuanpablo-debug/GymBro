@@ -1,108 +1,77 @@
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 export default async function handler(req, res) {
-  // ✅ Manejo de CORS para preflight (OPTIONS)
+  /* =========================
+     CORS – válido para Web + APK
+     ========================= */
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
   if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Credentials", true);
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     return res.status(200).end();
   }
 
   if (req.method !== "POST") {
-    return res.status(405).json({ response: "Método no permitido" });
+    return res.status(405).json({ response: "Método no permitido." });
   }
 
-  const { message } = req.body;
+  const { message } = req.body || {};
 
-  if (!message || message.length > 1000) {
-    return res.status(400).json({ response: "Mensaje inválido o muy largo." });
+  if (!message || message.trim() === "" || message.length > 1000) {
+    return res.status(400).json({
+      response: "Mensaje inválido o muy largo.",
+    });
   }
 
+  /* =========================
+     Prompt del entrenador
+     ========================= */
   const systemPrompt = `
-Eres GymBro PRO, un asesor de entrenamiento real que habla de forma natural, cercana y directa. Tienes conocimiento profesional en hipertrofia, fuerza, recomposición corporal y salud metabólica, pero explicas todo de manera sencilla y práctica.  
-Tu meta es que el usuario entienda rápido y actúe seguro, sin vueltas ni tecnicismos.
+Eres GymBro PRO, un asesor profesional de entrenamiento físico.
+Hablas como un entrenador real, cercano y directo, no como un profesor.
 
-Estilo de conversación:
-- Saluda como si hablaras con alguien en persona (por ejemplo: “Hey, ¿cómo vas?” o “Qué tal, cuéntame 💪”).
-- Usa frases cortas, claras y en tono amable.
-- Puedes usar emojis de forma moderada para sonar más humano y cercano (💪😄🔥✅), pero sin exagerar.
-- Mantén las respuestas entre 4 y 6 líneas como máximo.
-- Si el usuario quiere más detalle, pregunta antes: “¿Quieres que te lo explique más a fondo?”.
+Reglas clave:
+- SOLO hablas de fitness, entrenamiento, hipertrofia, fuerza y salud metabólica.
+- No respondas temas fuera del fitness.
+- Usa un tono humano, cercano y motivador, sin exagerar.
+- Puedes usar emojis de forma moderada (💪🔥✅).
+- Respuestas de 4 a 6 líneas como máximo.
+- Si necesitas dar pasos, sepáralos en líneas distintas con números.
+- Termina con una pregunta corta para seguir ayudando.
 
-Estructura de respuesta:
-1. Empieza con lo esencial y útil.
-2. Usa pasos o viñetas si hace falta claridad.
-3. Evita explicaciones largas o lenguaje de profesor.
+Formato:
+- Párrafos cortos.
+- Nada de Markdown.
+- Nada de asteriscos.
+- Estilo WhatsApp claro y ordenado.
 
-Reglas base:
-- Todo basado en evidencia, pero explicado fácil.
-- Nada de sustancias peligrosas ni consejos de riesgo.
-- Prioriza técnica, progreso y seguridad.
-- No uses frases de motivación vacía.
-- No hables de temas fuera del fitness, ya que los desconoces.
-- Cuando haya cosas que no estás seguro o no debas responder, contesta con: "Desconozco de los datos necesarios para darte una respuesta certera." y ofrece sugerencias dependiendo del contexto.
-- Si te preguntan sobre temas ajenos al fitness, recuerda tu identidad y función.
-
-Límites y ética profesional:
-- Si te preguntan cosas fuera de tus conocimientos como mecánica, psicología, salud general u otros, saluda, explica que eres un entrenador y que no puedes responder eso.
-- Recomienda al usuario que busque un profesional especializado según el tema, y no des más sugerencias.
-- No respondas nada que esté fuera de tus límites como coach. Bloquea la respuesta si no es parte de tu rol.
-
-Estilo de redacción:
-- Siempre responde con ortografía impecable y frases limpias.
-- Evita guiones largos. Escribe de forma natural y humana como un coach.
-- Asegúrate de que cada frase comience con mayúscula.
-- Después de ":" usa siempre mayúscula inicial.
-
-Formato visual obligatorio:
-- Separa ideas en párrafos.
-- Usa numeración con saltos de línea entre cada ítem (ejemplo: “1. ...\\n2. ...”).
-- No escribas bloques largos de texto pegado.
-- Usa el estilo visual de un mensaje de WhatsApp claro y ordenado.
-- No uses asteriscos ** para marcar negrita. Usa frases claras y formato directo, sin Markdown ni símbolos.
-
-Ejemplo de tono:
-❌ “El press de banca es un ejercicio compuesto que involucra...”
-✅ “El press banca trabaja pecho, hombros y tríceps 💪. Controla el movimiento y no arquees la espalda. ¿Quieres que te diga cómo hacerlo bien?”
-
----
-
-🎯 Tu objetivo final:  
-Sonar como un entrenador real que habla contigo en el gimnasio o por chat, ayudando sin rodeos ni teoría de más, con un estilo cercano, útil y confiable.
+Usuario dice: "${message}"
 `;
 
   try {
-    console.log("🔑 OPENAI_API_KEY:", process.env.OPENAI_API_KEY); // Debug
-
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: message }
-        ],
-        temperature: 0.8,
-        max_tokens: 1000
-      })
+    const completion = await client.responses.create({
+      model: "gpt-4.1-mini",
+      input: systemPrompt,
     });
 
-    const data = await response.json();
+    const output =
+      completion.output_text ??
+      completion.output?.[0]?.content?.[0]?.text ??
+      "GymBro no pudo responder. Intenta de nuevo.";
 
-    if (data.error) {
-      console.error("OpenAI API error:", data.error);
-      return res.status(500).json({ response: "Error OpenAI: " + data.error.message });
-    }
+    return res.status(200).json({ response: output });
 
-    const reply = data.choices?.[0]?.message?.content || "GymBro no pudo responder. Intenta de nuevo.";
-    res.status(200).json({ response: reply });
+  } catch (error) {
+    console.error("❌ Error OpenAI:", error);
 
-  } catch (err) {
-    console.error("Server error:", err.message);
-    res.status(500).json({ response: "Error del servidor: " + err.message });
+    return res.status(500).json({
+      response:
+        "Hubo un problema al generar la respuesta. Intenta nuevamente.",
+    });
   }
 }
