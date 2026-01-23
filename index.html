@@ -81,7 +81,6 @@
       padding: 12px 15px;
       border-radius: 15px;
       line-height: 1.5;
-      position: relative;
       word-wrap: break-word;
       animation: fadeIn 0.3s ease-in-out;
     }
@@ -178,10 +177,8 @@
       const bubble = document.createElement('div');
       bubble.classList.add('bubble');
 
-      // 💡 Corrección visual: Markdown → HTML
       bubble.innerHTML = content
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Negritas
-        .replace(/\n/g, '<br>');                           // Saltos de línea
+        .replace(/\n/g, '<br>');
 
       msgDiv.appendChild(bubble);
       chat.appendChild(msgDiv);
@@ -216,7 +213,7 @@
       appendTypingBubble();
 
       try {
-        const res = await fetch('https://gym-bro-black.vercel.app/api/chat', {
+        const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message })
