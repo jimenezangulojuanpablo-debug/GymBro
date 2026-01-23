@@ -1,4 +1,13 @@
 export default async function handler(req, res) {
+  // ✅ Manejo de CORS para preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    res.setHeader("Access-Control-Allow-Credentials", true);
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    return res.status(200).end();
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ response: "Método no permitido" });
   }
@@ -63,8 +72,7 @@ Sonar como un entrenador real que habla contigo en el gimnasio o por chat, ayuda
 `;
 
   try {
-    // 🔍 Esto te ayudará a ver si la variable se está leyendo bien en Vercel
-    console.log("OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
+    console.log("🔑 OPENAI_API_KEY:", process.env.OPENAI_API_KEY); // Debug
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
